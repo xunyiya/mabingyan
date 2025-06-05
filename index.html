@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>给我最爱的人</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #ffebee;
+            margin: 0;
+            padding: 0;
+            transition: background-color 1s;
+            text-align: center;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #e91e63;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .love-message {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            transition: transform 0.3s;
+        }
+        
+        .love-message:hover {
+            transform: scale(1.02);
+        }
+        
+        .photo-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .photo-frame {
+            width: 200px;
+            height: 200px;
+            border: 10px solid white;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transition: transform 0.3s;
+            position: relative;
+        }
+        
+        .photo-frame:hover {
+            transform: scale(1.1) rotate(5deg);
+            z-index: 10;
+        }
+        
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .photo-placeholder {
+            background-color: #f8bbd0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .memory-note {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(233, 30, 99, 0.8);
+            color: white;
+            padding: 5px;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+        }
+        
+        .photo-frame:hover .memory-note {
+            transform: translateY(0);
+        }
+        
+        .interactive-section {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        button {
+            background-color: #e91e63;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        
+        button:hover {
+            background-color: #c2185b;
+            transform: scale(1.05);
+        }
+        
+        #love-meter {
+            width: 100%;
+            background-color: #f8bbd0;
+            border-radius: 10px;
+            margin: 20px 0;
+            height: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #love-meter-fill {
+            height: 100%;
+            background-color: #e91e63;
+            width: 0%;
+            transition: width 1s;
+        }
+        
+        #heart-game {
+            height: 300px;
+            position: relative;
+            border: 2px dashed #e91e63;
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .falling-heart {
+            position: absolute;
+            color: #e91e63;
+            font-size: 24px;
+            animation: fall linear;
+            user-select: none;
+        }
+        
+        @keyframes fall {
+            from { top: -30px; }
+            to { top: 300px; }
+        }
+        
+        #score {
+            font-weight: bold;
+            color: #e91e63;
+            font-size: 24px;
+        }
+        
+        .hidden-message {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s;
+            background-color: #fce4ec;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        
+        .hidden-message.visible {
+            max-height: 200px;
+            padding: 15px;
+        }
+        
+        footer {
+            margin-top: 50px;
+            padding: 20px;
+            color: #e91e63;
+            font-style: italic;
+        }
+        
+        #heart-container {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        .floating-heart {
+            position: absolute;
+            color: #e91e63;
+            font-size: 30px;
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite;
+            opacity: 0;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div id="heart-container"></div>
+    
+    <div class="container">
+        <header>
+            <h1>❤️ 给我最珍贵的你 ❤️</h1>
+            <p>每一天有你的陪伴都是如此美好</p>
+        </header>
+        
+        <div class="love-message">
+            <h2>亲爱的，</h2>
+            <p>这个网页是专门为你设计的，里面装满了我对你的爱和我们共同的回忆。希望它能让你开心，就像你总是让我感到幸福一样。</p>
+            <p>我想用这种特别的方式告诉你，你对我有多重要。</p>
+            <button id="change-color">换个心情颜色</button>
+        </div>
+        
+        <h2>我们的美好瞬间</h2>
+        <p>点击照片查看我们共同的回忆</p>
+        
+        <div class="photo-gallery">
+            <div class="photo-frame">
+                <img src="mmmexport1747055884903.jpg" alt="我们的第一次约会">
+                <div class="memory-note">我们的第一次约会</div>
+            </img>
+            <div class="photo-frame">
+                <img src="mmexport1747753154360.jpg" alt="一起的美好时光">
+                <div class="memory-note">一起的美好时光</div>
+            </img>
+            <div class="photo-frame">
+                <img src="IMG_20250524_211956.jpg" alt="和你在一起的每一刻">
+                <div class="memory-note">和你在一起的每一刻</div>
+            </img>
+            <div class="photo-frame">
+                <img src="Screenshot_20250528_212435_com_tencent_mm_VideoActivity.jpg" alt="最爱你的笑容">
+                <div class="memory-note">最爱你的笑容</div>
+            </img>
+        </div>
+        
+        <div class="interactive-section">
+            <h2>我们的爱情温度计</h2>
+            <p>点击按钮，看看我们的爱有多深❤️</p>
+            <div id="love-meter">
+                <div id="love-meter-fill"></div>
+            </div>
+            <button id="measure-love">测量我们的爱</button>
+            <div id="love-result" class="hidden-message">
+                <p>哇！我们的爱情温度计爆表了！这证明我们的爱情超越了宇宙的极限！</p>
+            </div>
+        </div>
+        
+        <div class="interactive-section">
+            <h2>收集爱心小游戏</h2>
+            <p>点击下方区域中落下的爱心，看看你能收集多少！</p>
+            <div id="heart-game"></div>
+            <p>得分: <span id="score">0</span></p>
+            <button id="start-game">开始游戏</button>
+            <div id="game-message" class="hidden-message">
+                <p>你的爱心收集能力和你给我的爱一样多！</p>
+            </div>
+        </div>
+        
+        <div class="interactive-section">
+            <h2>给你的悄悄话</h2>
+            <p>点击下方按钮，查看我想对你说的话</p>
+            <button id="show-secret">查看秘密消息</button>
+            <div id="secret-message" class="hidden-message">
+                <p>亲爱的，自从遇见你，我的生活变得如此美好。谢谢你一直以来的陪伴和支持。我爱你，不仅仅是今天，而是每一天。</p>
+                <p>你是我生命中最美好的礼物，我希望能永远和你在一起，分享生活中的每一个时刻。</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>用❤️制作 | 永远爱你</p>
+        </footer>
+    </div>
+    
+    <script>
+        // 更换背景颜色
+        document.getElementById('change-color').addEventListener('click', function() {
+            const colors = ['#ffebee', '#e8f5e9', '#e3f2fd', '#f3e5f5', '#fff8e1'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            document.body.style.backgroundColor = randomColor;
+            
+            // 创建漂浮的心形
+            createFloatingHearts(10);
+        });
+        
+        // 爱情温度计
+        document.getElementById('measure-love').addEventListener('click', function() {
+            const loveMeterFill = document.getElementById('love-meter-fill');
+            let width = 0;
+            const interval = setInterval(() => {
+                width += 1;
+                loveMeterFill.style.width = width + '%';
+                if (width >= 100) {
+                    clearInterval(interval);
+                    document.getElementById('love-result').classList.add('visible');
+                    createFloatingHearts(20);
+                }
+            }, 30);
+        });
+        
+        // 秘密消息
+        document.getElementById('show-secret').addEventListener('click', function() {
+            document.getElementById('secret-message').classList.toggle('visible');
+            if (document.getElementById('secret-message').classList.contains('visible')) {
+                createFloatingHearts(15);
+            }
+        });
+        
+        // 爱心游戏
+        let gameInterval;
+        let score = 0;
+        
+        document.getElementById('start-game').addEventListener('click', function() {
+            const gameArea = document.getElementById('heart-game');
+            score = 0;
+            document.getElementById('score').textContent = score;
+            document.getElementById('game-message').classList.remove('visible');
+            
+            // 清除之前的游戏
+            clearInterval(gameInterval);
+            gameArea.innerHTML = '';
+            
+            // 开始新游戏
+            gameInterval = setInterval(() => {
+                createFallingHeart();
+            }, 800);
+            
+            // 60秒后结束游戏
+            setTimeout(() => {
+                clearInterval(gameInterval);
+                document.getElementById('game-message').classList.add('visible');
+                if (score > 10) {
+                    createFloatingHearts(score);
+                }
+            }, 30000);
+        });
+        
+        function createFallingHeart() {
+            const gameArea = document.getElementById('heart-game');
+            const heart = document.createElement('div');
+            heart.classList.add('falling-heart');
+            heart.textContent = '❤️';
+            heart.style.left = Math.random() * (gameArea.offsetWidth - 30) + 'px';
+            
+            // 随机下落速度
+            const duration = Math.random() * 3 + 2; // 2-5秒
+            heart.style.animationDuration = duration + 's';
+            
+            heart.addEventListener('click', function() {
+                score++;
+                document.getElementById('score').textContent = score;
+                this.remove();
+            });
+            
+            gameArea.appendChild(heart);
+            
+            // 移除超出边界的心形
+            setTimeout(() => {
+                if (heart.parentNode === gameArea) {
+                    heart.remove();
+                }
+            }, duration * 1000);
+        }
+        
+        // 创建漂浮的爱心
+        function createFloatingHearts(count) {
+            const container = document.getElementById('heart-container');
+            
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.classList.add('floating-heart');
+                    heart.textContent = '❤️';
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    heart.style.top = (70 + Math.random() * 30) + 'vh';
+                    heart.style.animationDelay = (Math.random() * 2) + 's';
+                    
+                    container.appendChild(heart);
+                    
+                    // 动画结束后移除
+                    setTimeout(() => {
+                        heart.remove();
+                    }, 6000);
+                }, i * 100);
+            }
+        }
+    </script>
+</body>
+</html>
